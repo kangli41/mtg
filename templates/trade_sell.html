@@ -44,16 +44,19 @@ $(document).ready(function() {
     table = $('#pre_table').DataTable({
         columnDefs: [ {
             orderable: true,
-
-            // className: 'select-checkbox',
+            className: 'select-checkbox',
             targets:   0
-        } ],
+        } ,{
+                "targets": [ 1 ],
+                "visible": false,
+                "searchable": false
+            }, ],
         select: {
             style:    'os',
             selector: 'td:first-child'
         },
-        order: [[ 8, 'desc' ]],
-        "pageLength": 25,
+        order: [[ 7, 'desc' ]],
+        "pageLength": 100,
     });
     // $('#aaa').click( function () {
     //     alert( table.$('tr.select-checkbox::after').eq(0).text());
@@ -61,17 +64,17 @@ $(document).ready(function() {
     // });
 
     $('#pre_table tbody').on( 'click', 'tr', function () {
-        if ( $(this).hasClass('selected') ) {
-            $(this).removeClass('selected');
-        }
-        else {
-            table.$('tr.selected').removeClass('selected');
-            $(this).addClass('selected');
-        }
+        $(this).toggleClass('selected');
     } );
  
-    $('#aaa').click( function () {
-        alert(table.row('.selected').data());
+    $('#sd').click( function () {
+      var t1_list = ''
+      table1_value = table.row('.selected').data();
+      for (var i = table1_value.length - 1; i >= 0; i--) {
+            t1_list = t1_list + table1_value[i][1] + ',';
+        };
+      //t1_list = t1_list.substring(0,t1_list.length-1);
+      alert(table1_value[1]);
     } );
 });
 
@@ -88,11 +91,12 @@ $(document).ready(function() {
         {% block sidebar %}
           <ul class="nav nav-sidebar">
             <!-- <li class="active"><a href="#">Overview <span class="sr-only">(current)</span></a></li> -->
-            <li><a href="/trade">Trade</a></li>
+            <li class="active"><a href="#">Trade</a></li>
           </ul>
           <ul class="nav nav-sidebar">
-            <li class="active"><a href="/trade/history">Trade History</a></li>
+            <li><a href="/trade/history">Trade History</a></li>
           </ul>
+
         {% endblock%}
           <!-- <ul class="nav nav-sidebar">
             <li><a href="">Nav item</a></li>
@@ -106,24 +110,18 @@ $(document).ready(function() {
             <li><a href="">One more nav</a></li>
             <li><a href="">Another nav item</a></li>
           </ul> -->
-        </div>
+        </div>type="button" class="btn btn-default" 
         
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-          <h1 class="page-header">
-            <button type="button" class="btn btn-primary btn-lg">Trade History</button>
-          </h1>     
-        <h3>Total Profit: {% if total_tix > 0 %}
-        <span class="label label-default label-danger">{{total_tix}}</span>
-                              {% else %}
-                      <span class="label label-default label-success">{{total_tix}}</span>
-                      {% endif %}  
-        </h3>
+
 
 
           <div class="table-responsive">
             <table id="pre_table" class="table table-striped table-bordered table-hover" cellspacing="0" width="100%">
               <thead>
                 <tr>
+                  <th></th>
+                  <th></th>
                   <th>Usage</th>
                   <th>Name</th>
                   <th>Set</th>
@@ -132,17 +130,19 @@ $(document).ready(function() {
                   <th>Current</th>                  
                   <th>Profit</th>
                   <th>Percent</th>                  
-<!--                   <th>Daily</th>   
-                  <th>Weekly</th> -->
-                  <th>Update</th>                             
+                  <th>Daily</th>   
+                  <th>Weekly</th>
+                  <th>Update</th>                              
                 </tr>
               </thead>
               <tbody>
-              {% for instance in lg_list %}
+              {% for instance in const_lg %}
                 <tr>                  
 <!--                   <td><a href="/coverage/detail/{{ instance.cover.platform }}">{{ instance.cover.platform }}</a></td> -->
+                  <td></td>
+                  <td>{{ instance.id }}</td>
                   <td>{{ instance.usege }}</td>
-                  <td>{{ instance.card_name }}</td>
+                  <td><a target=“_blank” href={{instance.card_link}}>{{ instance.card_name }}</a></td>
                   <td>{{ instance.card_set }}</td>
                   <td>{{ instance.quantity }}</td>
                   <td>{{ instance.cost }}</td>
@@ -161,7 +161,7 @@ $(document).ready(function() {
                       {% endif %}  
                   
                   </td>
-                  <!-- <td>{% if instance.daily > 0 %}
+                  <td>{% if instance.daily > 0 %}
                       <span class="label label-default label-danger">{{ instance.daily }}</span>
                       {% else %}
                       <span class="label label-default label-success">{{ instance.daily }}</span>
@@ -171,13 +171,63 @@ $(document).ready(function() {
                       <span class="label label-default label-danger">{{ instance.weekly }}</span>
                       {% else %}
                       <span class="label label-default label-success">{{ instance.weekly }}</span>
-                      {% endif %}  </td> -->
-                  <td>{{ instance.updated }}</td>               
+                      {% endif %}  </td>
+                  <td>{{ instance.updated }}</td>
+               
                 </tr>
               {% endfor %}
               </tbody>
             </table>
           </div>
+
+          <h1 class="page-header">
+            <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#sell_card">Sell Card</button>
+          </h1>    
+
+        <div class="modal fade" id="sell_card" role="dialog">
+            <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Sell Card</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <!-- <div class="col-md-12">
+                            <button type="button" class="btn btn-default" id="fan-config-cache">Apply Caching</button>
+                        </div> -->
+
+<!--                         <h4 class="col-md-12">Format</h4> -->
+                        <div class="col-md-12">
+                                <!-- <div class="input-group input-suite">
+                                    <span class="input-group-addon">Deck</span>
+                                    <input name="deck" type="text"
+                                           class="form-control">
+                                </div>
+                                <div class="input-group input-suite">
+                                    <span class="input-group-addon">Format</span>
+                                    <input name="format" type="text"
+                                           class="form-control"
+                                           placeholder="Search for...">
+                                </div> -->
+                          <form method='POST' action=''>{% csrf_token %}
+                            {{ form_sell|crispy }}
+                            <input class="btn btn-default" type='submit' value='Submit'/>
+                          </form>
+                        </div>              
+                    </div>
+                </div>
+            </div>
+
+            </div>
+        </div>
+
+
+          <div class="thetimenow-embeddable-clock" data-type="clock" data-font-color="#000000" data-border-color="#000000" data-background-color="#ffffff" data-font-size="60" data-location-type="timezone" data-location-id="115" > <a href="http://zh.thetimenow.com/pst/pacific_standard_time" rel="nofollow" target="_blank">Pacific Standard Time</a> </div> 
+<script type="text/javascript" src="http://zh.thetimenow.com/ttn-embed.min.js"></script>
         </div> 
+
 </body>
 </html>

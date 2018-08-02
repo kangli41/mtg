@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from .models import ConstructLeagueForm,ConstructLeague,ConstructGameForm,ConstructGame,BonusForm
-
+from django.contrib.auth.decorators import login_required
 
 def get_card_info(card,card_set):
     html = get_html(card,card_set)
@@ -11,6 +11,7 @@ LG_TYPE = ['Friendly','Competitive']
 LG_FORMAT = ['Standard','Modern','Pauper','Legacy','Commander']
 
 # Create your views here.
+@login_required(login_url='/admin/login/')
 def home(request):
     
     form = ConstructLeagueForm(request.POST or None)
@@ -38,6 +39,7 @@ def home(request):
     
     return render(request,'battle_home.html',context)
 
+@login_required(login_url='/admin/login/')
 def league_detail(request,id):
     form = ConstructGameForm(request.POST or None)
     form_finish = BonusForm(request.POST or None)
@@ -97,7 +99,7 @@ def league_detail(request,id):
 
     return render(request,'battle_lg_detail.html',context)
 
-
+@login_required(login_url='/admin/login/')
 def battle_history(request):
     
     #form = ConstructLeagueForm(request.POST or None)
@@ -140,6 +142,8 @@ def battle_history(request):
                         dic_de['minutes_lg'] = dic_de['during'] / dic_de['lg_num']
                         dic_de['profit_game'] = "%.2f" % dic_de['profit_game']
                         dic_de['profit_hour'] = "%.2f" %dic_de['profit_hour']
+                        dic_de['minutes_game'] = dic_de['during'] / (dic_de['win'] + dic_de['lose'])
+                        dic_de['minutes_game'] = "%.2f" %dic_de['minutes_game']
                         dic_de['minutes_lg'] = "%.2f" %dic_de['minutes_lg'] 
                         dic_de['profit'] = "%.2f"%dic_de['profit']
                         dic_de['id'] = dic_de['id_list'][0]
@@ -152,6 +156,7 @@ def battle_history(request):
                }   
     return render(request,'battle_history.html',context)  
 
+@login_required(login_url='/admin/login/')
 def battle_history_detail(request,id):
     
     #form = ConstructLeagueForm(request.POST or None)
@@ -244,7 +249,7 @@ def battle_history_detail(request,id):
 
     return render(request,'battle_history_detail.html',context)  
 
-
+@login_required(login_url='/admin/login/')
 def trade_home(request):
     
     form = CardCollectForm(request.POST or None)

@@ -20,6 +20,11 @@ from . import views
 urlpatterns = [
     url(r'^$', views.home, name='home'),
     url(r'^card_update$', views.card_update, name='card_update'),
+    url(r'^history/$', views.trade_history, name='trade_history'),
+    url(r'^scrubber$', views.card_scrubber, name='card_scrubber'),
+    url(r'^card_sell/(.*)$', views.card_sell, name='card_sell'),
+    url(r'^card_analysis$', views.card_analysis, name='card_analysis'),
+    
     # url(r'^detail/(.+)$', views.league_detail, name='league_detail'),
     # url(r'^history/$', views.battle_history, name='battle_history'),
     # url(r'^history/(.+)$', views.battle_history_detail, name='battle_history_detail'),
